@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Разработка flask приложений с использованием classy подхода</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					<textarea data-template>
+						### Разработка flask приложений с использованием classy подхода
+
+						<div><img src="http://qrcoder.ru/code/?https%3A%2F%2Fclck.ru%2FHpqd7&4&0" width="30%"></div>
+						https://clck.ru/Hpqd7
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## О чем я расскажу
+
+						- Про способы роутинга
+						- Про "классическую архитектуру" flask проектов
+						- Про то как надо писать flask проекты
+						- Про classy
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Способы машрутизации
+
+						- url route (классический подход)
+						- classy
+						- traversal (pyramid, zope)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						<img data-src="images/siyanie.jpg" width="60%" style="border: none;">
+
+						«‎Пишите код так, как будто сопровождать его будет склонный к насилию психопат, который знает, где вы живёте.»
+						> Стив Макконнелл
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						<img data-src="images/armin.jpg" width="85%" height="85%" style="border: none;">
+						<div>Упссс, забыл....</div>
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Структура классического flask проекта
+
+						```
+						.
+						├── app
+						│   ├── __init__.py
+						│   ├── forms.py
+						│   ├── models.py
+						│   ├── views.py
+						│   └── templates
+						├── config.py
+						└── migrations
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						`microblog/app/__init__.py`
+						```python
+						import flask
+						from flask_mail import Mail
+						# other extensions
+
+						app = Flask(__name__)
+						mail = Mail(app)
+						# configure flask app
+
+						from app import views, models
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						`microblog/app/views.py`
+						```python
+						from flask import abort
+						# other imports
+
+						from app import app
+
+						@app.route('/view_name/'):
+						def view_name():
+							 pass
+						```
+					</textarea>
+				</section>
+
+
+				<section data-markdown>
+					<textarea data-template>
+						## Минусы классической архитектуры
+
+						- костыли для обхода циклического импорта
+						- проект невозможно расширять
+						- пропагандируется не правильное использование билиотек (sqlalchemy and etc)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Структура проекта при использовании classy
+
+						```
+						.
+						├── app
+						│   ├── static
+						│   ├── templates
+						│   ├── forms.py
+						│   ├── routes.py
+						│   ├── views.py
+						│   └── tasks.py
+						├── models
+						├── app.py
+						├── config.py
+						└── handlers.py
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						`microblog/app.py`
+						```python
+						import flask
+						from flask_mail import Mail
+						# other extensions
+
+						from app import route as app_route
+
+						app = Flask(__name__)
+						mail = Mail(app)
+						# configure flask app
+
+						app.register_blueprint(app_route.app_blueprint)
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						`microblog/app/routes.py`
+						```python
+						from flask import Blueprint
+
+						from app import views
+
+						app_blueprint = Blueprint(...)
+
+						views.AccountView.register(app_blueprint)
+						# register other views
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						`microblog/app/views.py`
+						```python
+						from flask_classy import FlaskView, route
+						from flask_login import login_required
+
+						class AccountView(FlaskView):
+
+							 def login(self):
+								  pass
+
+							 # other views
+
+							 @login_required
+							 def logout(self):
+								  pass
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+                  ## classy подход
+
+                  ```python
+                  class ArticleView(FlaskView):
+
+                     # /article/
+                     def index(self):
+                       return 'article index'
+
+                     # /article/all/
+                     def all(self):
+                       return f'all article'
+
+                     # /article/user_article/1
+                     def user_article(self, user_id):
+                       return f'user (id={user_id}) article'
+                  ```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Парсинг аргументов
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## RESTful
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Наследование
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Декораторы
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Вопросы
+
+						- презентация: https://clck.ru/Hpqd7
+						- telegram: @petrunnik_a
+					</textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
