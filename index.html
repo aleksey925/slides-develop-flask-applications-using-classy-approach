@@ -26,12 +26,10 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
+
 				<section data-markdown>
 					<textarea data-template>
 						### Разработка flask приложений с использованием classy подхода
-
-						<div><img src="http://qrcoder.ru/code/?https%3A%2F%2Fclck.ru%2FHpqd7&4&0" width="30%"></div>
-						https://clck.ru/Hpqd7
 					</textarea>
 				</section>
 
@@ -74,7 +72,25 @@
 
 				<section data-markdown>
 					<textarea data-template>
-						## Структура классического flask проекта
+						#### Проблемы "классической архитектуры" на примере Hello world
+
+						```python
+						from flask import Flask
+
+						app = Flask(__name__)
+
+						@app.route('/')
+						def index():
+							 return 'Hello world from flask'
+
+						app.run(debug=True)
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Структура "классического" flask проекта
 
 						```
 						.
@@ -130,7 +146,7 @@
 
 						- костыли для обхода циклического импорта
 						- проект невозможно расширять
-						- пропагандируется не правильное использование билиотек (sqlalchemy and etc)
+						- пропагандируется не правильное использование билиотек (sqlalchemy и т.д.)
 					</textarea>
 				</section>
 
@@ -163,7 +179,7 @@
 						from flask_mail import Mail
 						# other extensions
 
-						from app import route as app_route
+						from app import routes as app_route
 
 						app = Flask(__name__)
 						mail = Mail(app)
@@ -211,49 +227,102 @@
 					</textarea>
 				</section>
 
-				<section data-markdown>
-					<textarea data-template>
-                  ## classy подход
+				<section >
+					<h2>classy подход на пальцах</h2>
 
-                  ```python
-                  class ArticleView(FlaskView):
+					<pre><code data-trim data-noescape>
+class ArticleView(FlaskView):
 
-                     # /article/
-                     def index(self):
-                       return 'article index'
+    def root(self):
+        return 'article root'
 
-                     # /article/all/
-                     def all(self):
-                       return f'all article'
+    def all(self):
+        return f'all article'
+					</code></pre>
 
-                     # /article/user_article/1
-                     def user_article(self, user_id):
-                       return f'user (id={user_id}) article'
-                  ```
-					</textarea>
+					<pre class="fragment"><code>/article/root/ -> root</code></pre>
+					<pre class="fragment"><code>/article/all/ -> all</code></pre>
 				</section>
 
-				<section data-markdown>
-					<textarea data-template>
-						## Парсинг аргументов
-					</textarea>
-				</section>
+				<section>
+					<h2>Специальные методы</h2>
 
-				<section data-markdown>
-					<textarea data-template>
-						## RESTful
-					</textarea>
-				</section>
+					<pre><code data-trim data-noescape>
+class ArticleView(FlaskView):
+    def index(self):
+        return 'article index'
 
-				<section data-markdown>
-					<textarea data-template>
-						## Наследование
-					</textarea>
+    def get(self, id_article):
+        return f'article with id={id_article}'
+
+    def post(self):
+        pass
+
+    ...
+					</code></pre>
+
+					<pre class="fragment"><code>/article/ -> index (method get)</code></pre>
+					<pre class="fragment"><code>/article/1/ -> get (method get)</code></pre>
+					<pre class="fragment"><code>/article/ -> post (method post)</code></pre>
 				</section>
 
 				<section data-markdown>
 					<textarea data-template>
 						## Декораторы
+
+						```python
+						class ArticleView(FlaskView):
+
+							decorators = [login_required]
+
+							def index(self):
+								return 'article index'
+
+							def get(self, id_article):
+								return f'article with id={id_article}'
+						```
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Request Handlers
+
+						```python
+						class ArticleView(FlaskView):
+						    def before_request(self, view_name, **kwargs):
+						        pass
+
+							 def before_get(self, id_article):
+						        pass
+
+							 def get(self, id_article):
+						        return f'article with id={id_article}'
+
+							 def after_get(self, response):
+						        return response
+
+							 def after_request(self, view_name, response):
+						        return response
+						```
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## Достоинства classy подхода
+
+						- view сгруппированы в классы
+						- вы всегда знаете где произошла ошибка
+						- доработка библиотеки элементарна
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Полезные ссылки
+
+						- [Пример проекта сделанного с использованием classy подхода](https://bitbucket.org/alex925/bulls-and-cows-game/)
+						- [Pyramid Traversal - Дмитрий Вахрушев](https://www.youtube.com/watch?v=tjXydzO0qDY)
 					</textarea>
 				</section>
 
@@ -261,10 +330,13 @@
 					<textarea data-template>
 						## Вопросы
 
-						- презентация: https://clck.ru/Hpqd7
 						- telegram: @petrunnik_a
+						- презентация: https://clck.ru/Hpqd7
+
+						<div><img src="images/slides-qrcode-url.gif" width="30%"></div>
 					</textarea>
 				</section>
+
 			</div>
 		</div>
 
